@@ -1,0 +1,49 @@
+auth_enabled: {{ loki_auth_enabled | bool | lower }}
+  
+server:
+  {{ loki_config_server | to_nice_yaml(indent=2) | indent(2, False) }}
+
+{% if loki_common is defined %}
+common:
+  {{ loki_common | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_schema_config is defined %}
+schema_config:
+  {{ loki_schema_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_limits_config is defined %}
+limits_config:
+  {{ loki_limits_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_chunk_store_config is defined %}
+chunk_store_config:
+  {{ loki_chunk_store_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_table_manager is defined %}
+table_manager:
+  {{ loki_table_manager | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_query_scheduler is defined %}
+query_scheduler:
+  {{ loki_query_scheduler | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_querier is defined %}
+querier:
+  {{ loki_querier | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_frontend is defined %}
+frontend:
+  {{ loki_frontend | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_ingester is defined %}
+ingester:
+  {{ loki_ingester | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}

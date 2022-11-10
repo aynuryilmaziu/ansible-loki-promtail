@@ -1,0 +1,13 @@
+[Unit]
+Description=promtail
+After=network-online.target
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutSec=5
+User=root
+ExecStart=/usr/local/bin/promtail-linux-amd64 -config.file={{ promtail_config_file }} -log.level={{ promtail_log_level }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,76 @@
+loki_apt_update_cache: True
+loki_version: "v2.6.1"
+loki_auth_enabled: false
+loki_custom_checksum: ""
+loki_config_dir: /etc/loki
+loki_config_file: "{{ loki_config_dir }}/loki.yml"
+
+loki_systemd_service_template_file: loki-service.j2
+loki_systemd_service: loki
+
+loki_log_level: info
+# One of: debug, info, warn, error
+
+loki_config_server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+loki_common:
+  path_prefix: /data/loki
+  storage:
+    filesystem:
+      chunks_directory: /data/loki/chunks
+      rules_directory: /data/loki/rules
+  replication_factor: 1
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+
+loki_schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+loki_limits_config:
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+  ingestion_rate_mb: 12
+  ingestion_burst_size_mb: 24
+  per_stream_rate_limit: 12MB
+  split_queries_by_interval: 24h
+
+loki_chunk_store_config:
+  max_look_back_period: 336h
+
+loki_table_manager:
+  retention_deletes_enabled: true
+  retention_period: 2190h
+
+loki_query_scheduler:
+  max_outstanding_requests_per_tenant: 2048
+  grpc_client_config:
+    max_send_msg_size: 33554432 # 32mb, default = 16777216]
+    max_recv_msg_size: 33554432
+
+
+loki_querier:
+  max_concurrent: 20
+
+loki_frontend:
+  max_outstanding_per_tenant: 2048
+
+loki_ingester:
+  lifecycler:
+    address: 127.0.0.1
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    final_sleep: 0s
+  chunk_encoding: snappy

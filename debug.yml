@@ -1,0 +1,15 @@
+- hosts: all
+  remote_user: root
+  vars:
+    #promtail_admins: [monops, devops]
+    #reset_promtail_service: False
+    #reset_promtail_data: False
+
+
+  tasks:
+    
+    - name: Install zip requirements
+      debug:
+        var: promtail_config_scrape_configs
+
+   

@@ -1,0 +1,61 @@
+- hosts: promtail
+  remote_user: root
+  vars:
+    promtail_admins: [monops, devops]
+    reset_promtail_service: False
+    reset_promtail_data: False
+
+  handlers:
+  - name: "Restart promtail"
+    systemd:
+      name: "{{ promtail_systemd_service }}"
+      state: restarted
+      daemon_reload: True
+    become: "yes"
+    ignore_errors: yes
+
+  tasks:
+    
+    - name: Install zip requirements
+      apt:
+        name: unzip
+
+    - name: Download and unpack tarball
+      unarchive:
+        src: "https://github.com/grafana/loki/releases/download/{{ promtail_version }}/promtail-linux-amd64.zip"
+        dest: /usr/local/bin
+        remote_src: true
+
+    - name: Create /etc/promtail
+      file:
+        state: directory
+        path: /etc/promtail
+        owner: root
+        group: root
+        mode: "700"
+
+    - name: Create /data/promtail
+      file:
+        state: directory
+        path: /data/promtail
+        owner: root
+        group: root
+        mode: "700"
+
+    - name: Install promtail config
+      template:
+        src: promtail.yaml.j2
+        dest: "{{ promtail_config_file }}"
+        mode: "644"
+
+    - name: Create systemd service unit
+      template:
+        src: "{{ promtail_systemd_service_template_file }}"
+        dest: "/etc/systemd/system/{{ promtail_systemd_service }}.service"
+        mode: 0644
+
+    - name: Enable and start promtail service
+      service:
+        name: promtail
+        state: started
+        enabled: true

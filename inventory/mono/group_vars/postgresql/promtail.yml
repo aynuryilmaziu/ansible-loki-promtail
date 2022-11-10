@@ -1,0 +1,28 @@
+promtail_config_scrape_configs:
+- job_name: pmgproxy
+  static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: pmgproxy
+        host: "{{ ansible_fqdn }}"
+        __path__: /var/log/pmgproxy/pmgproxy.log
+  pipeline_stages:
+  - replace:
+      expression: "^(\\d+-\\d+-\\d+ \\d+:\\d+:\\d+,\\d+ )"
+  - pack:
+      labels:
+
+- job_name: postgresql
+  static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: postgresql
+        host: "{{ ansible_fqdn }}"
+        __path__: /var/log/postgresql/*.log
+  pipeline_stages:
+  - replace:
+      expression: "^(\\d+-\\d+-\\d+ \\d+:\\d+:\\d+,\\d+ )"
+  - pack:
+      labels:

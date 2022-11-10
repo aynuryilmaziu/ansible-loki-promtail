@@ -1,0 +1,28 @@
+promtail_apt_update_cache: True
+promtail_version: "v2.6.1"
+promtail_custom_checksum: ""
+promtail_config_dir: /etc/promtail
+promtail_config_file: "{{ promtail_config_dir }}/promtail.yml"
+
+promtail_systemd_service_template_file: promtail-service.j2
+promtail_systemd_service: promtail
+
+promtail_log_level: info
+# One of: debug, info, warn, error
+
+promtail_config_server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+promtail_loki_server_ip: "{{ groups['loki'] | map('extract', hostvars, ['ansible_host']) | join(',') }}"
+promtail_loki_server_port: 3100
+promtail_loki_server_url: http://{{promtail_loki_server_ip}}:{{promtail_loki_server_port}}
+
+promtail_config_clients:
+  - url: "{{ promtail_loki_server_url }}/loki/api/v1/push"
+
+promtail_positions_directory: /data/promtail
+promtail_config_positions:
+  filename: "{{ promtail_positions_directory }}/positions.yml"
+
+#promtail_config_scrape_configs: []

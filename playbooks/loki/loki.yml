@@ -1,0 +1,64 @@
+- hosts: all
+  remote_user: root
+  vars:
+    loki_admins: [monops, devops]
+    reset_loki_service: False
+    reset_loki_data: False
+
+  handlers:
+  - name: "Restart loki"
+    systemd:
+      name: "{{ loki_systemd_service }}"
+      state: restarted
+      daemon_reload: True
+    become: "yes"
+    ignore_errors: yes
+
+  tasks:
+  - name: Install zip requirements
+    apt:
+      name: unzip
+
+  - name: Install jq requirements
+    apt:
+      name: jq
+
+  - name: Download and unpack tarball
+    unarchive:
+      src: "https://github.com/grafana/loki/releases/download/{{ loki_version }}/loki-linux-amd64.zip"
+      dest: /usr/local/bin
+      remote_src: true
+
+  - name: Create /etc/loki
+    file:
+      state: directory
+      path: /etc/loki
+      owner: root
+      group: root
+      mode: "700"
+
+  - name: Create /data/loki
+    file:
+      state: directory
+      path: /data/loki
+      owner: root
+      group: root
+      mode: "700"
+
+  - name: Install loki config
+    template:
+      src: loki.yaml.j2
+      dest: "{{ loki_config_file }}"
+      mode: "644"
+
+  - name: Create systemd service unit
+    template:
+      src: "{{ loki_systemd_service_template_file }}"
+      dest: "/etc/systemd/system/{{ loki_systemd_service }}.service"
+      mode: 0644
+
+  - name: Enable and start loki service
+    service:
+      name: loki
+      state: started
+      enabled: true
